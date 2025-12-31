@@ -9,6 +9,7 @@ A Neovim plugin to run Robot Framework tests in a floating window.
 - Run tests with the tag under the cursor.
 - Customizable commands.
 - Floating terminal window.
+- **Pass/Fail markers** displayed next to test cases after execution.
 
 ## Installation
 
@@ -37,6 +38,7 @@ The plugin activates automatically in `*.robot` files.
 - `:RobotRun [args]` - Run the full suite.
 - `:RobotRunTest [args]` - Run the test case under the cursor.
 - `:RobotRunTag [args]` - Run tests with the tag under the cursor.
+- `:RobotClear` - Clear all test markers from the buffer.
 
 You can pass additional arguments to the commands, e.g.:
 `:RobotRun -i smoke`
@@ -60,5 +62,15 @@ The default configuration is:
         height = 0.8,
         border = "rounded",
     },
+    icons = {
+        pass = "✓",
+        fail = "✗",
+    },
+    -- Clear markers before running new tests.
+    -- Set to false to accumulate results from multiple runs.
+    clear_on_run = true,
+
+    -- Display mode for markers: "eol" (end of line) or "sign_column" (left gutter)
+    display_mode = "eol",
 }
 ```

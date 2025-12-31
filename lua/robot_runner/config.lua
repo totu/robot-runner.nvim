@@ -22,6 +22,19 @@ M.defaults = {
         height = 0.8,
         border = "rounded",
     },
+
+    -- Icons for test status
+    icons = {
+        pass = "✓",
+        fail = "✗",
+    },
+    
+    -- Clear markers before running new tests.
+    -- Set to false to accumulate results from multiple runs.
+    clear_on_run = true,
+
+    -- Display mode for markers: "eol" (end of line) or "sign_column" (left gutter)
+    display_mode = "eol",
 }
 
 M.options = vim.deepcopy(M.defaults)
