@@ -9,6 +9,7 @@ A Neovim plugin to run Robot Framework tests in a floating window.
 - Run tests with the tag under the cursor.
 - Customizable commands.
 - Floating terminal window.
+- Toggle the floating window visibility (process continues in background).
 - **Pass/Fail markers** displayed next to test cases after execution.
 
 ## Installation
@@ -38,11 +39,19 @@ The plugin activates automatically in `*.robot` files.
 - `:RobotRun [args]` - Run the full suite.
 - `:RobotRunTest [args]` - Run the test case under the cursor.
 - `:RobotRunTag [args]` - Run tests with the tag under the cursor.
+- `:RobotToggle` - Toggle the floating terminal window.
 - `:RobotClear` - Clear all test markers from the buffer.
 
 You can pass additional arguments to the commands, e.g.:
 `:RobotRun -i smoke`
 `:RobotRunTest -v VAR:value`
+
+You can map this command to a keybinding in your Neovim configuration for easier access. 
+Using `<cmd>` allows the mapping to work in both normal and terminal modes:
+
+```lua
+vim.keymap.set({'n', 't'}, '<leader>rt', '<cmd>RobotToggle<CR>', { desc = 'Toggle Robot Runner Window' })
+```
 
 ## Configuration
 

@@ -2,6 +2,8 @@ local config = require("robot_runner.config")
 local M = {}
 
 local ns = vim.api.nvim_create_namespace("robot_runner")
+local last_terminal_buf = nil
+local last_terminal_win = nil
 
 -- Define highlight groups
 vim.api.nvim_set_hl(0, "RobotRunnerPass", { link = "String", default = true })
@@ -122,7 +124,20 @@ local function run_in_floating_win(cmd, source_buf)
     local row = math.floor((vim.o.lines - height) / 2)
     local col = math.floor((vim.o.columns - width) / 2)
 
+    -- Close existing window if open
+    if last_terminal_win and vim.api.nvim_win_is_valid(last_terminal_win) then
+        vim.api.nvim_win_close(last_terminal_win, true)
+    end
+
+    -- Cleanup previous buffer
+    if last_terminal_buf and vim.api.nvim_buf_is_valid(last_terminal_buf) then
+        vim.api.nvim_buf_delete(last_terminal_buf, { force = true })
+    end
+
     local buf = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_option(buf, 'bufhidden', 'hide')
+    last_terminal_buf = buf
+
     local win = vim.api.nvim_open_win(buf, true, {
         relative = "editor",
         width = width,
@@ -132,6 +147,7 @@ local function run_in_floating_win(cmd, source_buf)
         style = "minimal",
         border = config.options.window.border
     })
+    last_terminal_win = win
 
     -- Close window on 'q'
     vim.api.nvim_buf_set_keymap(buf, "n", "q", ":q<CR>", { noremap = true, silent = true })
@@ -211,6 +227,33 @@ function M.run_tag(args)
     run_in_floating_win(cmd, source_buf)
 end
 
+function M.toggle()
+    if last_terminal_win and vim.api.nvim_win_is_valid(last_terminal_win) then
+        vim.api.nvim_win_close(last_terminal_win, true)
+        last_terminal_win = nil
+    else
+        if last_terminal_buf and vim.api.nvim_buf_is_valid(last_terminal_buf) then
+            local width = math.floor(vim.o.columns * config.options.window.width)
+            local height = math.floor(vim.o.lines * config.options.window.height)
+            local row = math.floor((vim.o.lines - height) / 2)
+            local col = math.floor((vim.o.columns - width) / 2)
+            
+            last_terminal_win = vim.api.nvim_open_win(last_terminal_buf, true, {
+                relative = "editor",
+                width = width,
+                height = height,
+                row = row,
+                col = col,
+                style = "minimal",
+                border = config.options.window.border
+            })
+            vim.cmd("startinsert")
+        else
+            vim.notify("No active Robot Runner terminal found.", vim.log.levels.WARN)
+        end
+    end
+end
+
 function M.clear_markers()
     local buf = vim.api.nvim_get_current_buf()
     vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
@@ -240,6 +283,10 @@ function M.register_autocmds()
             end, {})
         end
     })
+
+    vim.api.nvim_create_user_command("RobotToggle", function()
+        M.toggle()
+    end, {})
 end
 
 function M.setup(options)
