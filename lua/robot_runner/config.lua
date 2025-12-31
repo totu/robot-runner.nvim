@@ -2,11 +2,11 @@ local M = {}
 
 M.defaults = {
     filetypes = { "robot" },
-    -- Command to run a specific test. 
+    -- Command to run a specific test.
     -- {file} will be replaced by the file path.
     -- {test} will be replaced by the test case name.
     test_command = "robot -t {test} {file}",
-    
+
     -- Command to run the full suite.
     -- {file} will be replaced by the file path.
     suite_command = "robot {file}",
@@ -28,7 +28,7 @@ M.defaults = {
         pass = "✓",
         fail = "✗",
     },
-    
+
     -- Clear markers before running new tests.
     -- Set to false to accumulate results from multiple runs.
     clear_on_run = true,
